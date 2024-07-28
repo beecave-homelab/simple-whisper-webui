@@ -106,6 +106,9 @@
         display: flex;
         justify-content: space-between;
       }
+      .button-group a {
+        text-decoration: none;
+      }
     </style>
   </head>
   <body>
@@ -138,7 +141,8 @@
           <textarea id="transcript" rows="15" readonly></textarea>
           <div class="button-group">
             <button type="submit" form="upload-form">Transcribe</button>
-            <button onclick="copyToClipboard()">Copy to Clipboard</button>
+            <button id="copy-btn" onclick="copyToClipboard()" style="display: none;">Copy to Clipboard</button>
+            <a id="download-btn" href="#" download style="display: none;"><button>Download to .txt</button></a>
           </div>
         </section>
       </div>
@@ -164,6 +168,8 @@
             contentType: false,
             success: function (data) {
               $('#transcript').text(data.transcript);
+              $('#copy-btn').show();
+              $('#download-btn').attr('href', '/download/' + data.transcript_path).show();
               clearInterval(progressInterval);
             },
             error: function (xhr, status, error) {
