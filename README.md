@@ -55,7 +55,7 @@ To set up the project locally, follow these steps:
 ## License
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-This project is licensed under the MIT license. See [LICENSE.md](LICENSE.md) for more information.
+This project is licensed under the MIT license. See [LICENSE](LICENSE) for more information.
 
 ## Contributing
 
