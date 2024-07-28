@@ -3,33 +3,145 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Audio Transcription</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Transcriptor | A simple webui for transcribing audio-to-text with Whisper</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --primary-color: #bb86fc;
+        --secondary-color: #03dac6;
+        --background-color: #121212;
+        --surface-color: #1e1e1e;
+        --on-surface-color: #e0e0e0;
+      }
+      body {
+        font-family: 'Roboto', sans-serif;
+        background-color: var(--background-color);
+        color: var(--on-surface-color);
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+      header {
+        background-color: var(--surface-color);
+        padding: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      h1 {
+        color: var(--primary-color);
+        margin: 0;
+        font-size: 1.5rem;
+        text-align: center;
+      }
+      h2 {
+        color: var(--secondary-color);
+        margin-bottom: 1rem;
+      }
+      .content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+      .upload-section, .transcript-section {
+        flex: 1;
+        min-width: 300px;
+      }
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--primary-color);
+      }
+      input[type="text"], input[type="file"], textarea {
+        width: 100%;
+        padding: 0.5rem;
+        background-color: var(--surface-color);
+        border: 1px solid #444;
+        color: var(--on-surface-color);
+        border-radius: 4px;
+      }
+      input[type="file"] {
+        padding: 0.3rem;
+      }
+      button {
+        background-color: var(--primary-color);
+        color: var(--background-color);
+        border: none;
+        padding: 0.7rem 1.5rem;
+        cursor: pointer;
+        border-radius: 4px;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+      }
+      button:hover {
+        background-color: #9965f4;
+      }
+      #transcript {
+        min-height: 200px;
+        resize: vertical;
+        margin-bottom: 1rem;
+      }
+      .progress-container {
+        margin-top: 1rem;
+      }
+      .progress {
+        background-color: var(--surface-color);
+        height: 20px;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      .progress-bar {
+        background-color: var(--secondary-color);
+        height: 100%;
+        transition: width 0.5s ease;
+      }
+      .button-group {
+        display: flex;
+        justify-content: space-between;
+      }
+    </style>
   </head>
   <body>
-    <div class="container mt-5">
-      <h1>Upload Audio File for Transcription</h1>
-      <form id="upload-form" enctype="multipart/form-data">
-        <div class="form-group">
-          <label for="domain">Domain</label>
-          <input type="text" class="form-control" id="domain" name="domain" placeholder="http://localhost:8000">
-        </div>
-        <div class="form-group">
-          <label for="audio_file">Audio File</label>
-          <input type="file" class="form-control-file" id="audio_file" name="audio_file">
-        </div>
-        <button type="submit" class="btn btn-primary">Upload</button>
-      </form>
-      <div class="mt-3">
-        <h3>Transcript</h3>
-        <textarea class="form-control" id="transcript" rows="10" readonly></textarea>
-        <button class="btn btn-secondary mt-2" onclick="copyToClipboard()">Copy to Clipboard</button>
-      </div>
-      <div class="mt-3">
-        <h3>Progress</h3>
-        <div class="progress">
-          <div class="progress-bar" role="progressbar" id="progress-bar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
-        </div>
+    <header>
+      <h1>Transcriptor | A simple webui for transcribing audio-to-text with Whisper</h1>
+    </header>
+    <div class="container">
+      <div class="content">
+        <section class="upload-section">
+          <h2>Upload Audio</h2>
+          <form id="upload-form" enctype="multipart/form-data">
+            <div class="form-group">
+              <label for="domain">Whisper API domain</label>
+              <input type="text" id="domain" name="domain" value="http://0.0.0.0:8080">
+            </div>
+            <div class="form-group">
+              <label for="audio_file">Audio File</label>
+              <input type="file" id="audio_file" name="audio_file">
+            </div>
+          </form>
+          <div class="progress-container">
+            <h2>Progress</h2>
+            <div class="progress">
+              <div class="progress-bar" role="progressbar" id="progress-bar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+        </section>
+        <section class="transcript-section">
+          <h2>Transcript</h2>
+          <textarea id="transcript" rows="15" readonly></textarea>
+          <div class="button-group">
+            <button type="submit" form="upload-form">Transcribe</button>
+            <button onclick="copyToClipboard()">Copy to Clipboard</button>
+            <a id="download-btn" href="#" download><button>Download to .txt</button></a>
+          </div>
+        </section>
       </div>
     </div>
 
@@ -53,15 +165,15 @@
             contentType: false,
             success: function (data) {
               $('#transcript').text(data.transcript);
-              clearInterval(progressInterval); // Clear progress interval
+              $('#download-btn').attr('href', '/download/' + data.transcript_path).show();
+              clearInterval(progressInterval);
             },
             error: function (xhr, status, error) {
               alert("An error occurred: " + error);
-              clearInterval(progressInterval); // Clear progress interval
+              clearInterval(progressInterval);
             }
           });
 
-          // Start progress check
           var progressInterval = setInterval(function() {
             $.ajax({
               url: '/progress',
@@ -70,7 +182,7 @@
                 var progress = data.progress;
                 $('#progress-bar').css('width', progress + '%').attr('aria-valuenow', progress);
                 if (progress >= 100) {
-                  clearInterval(progressInterval); // Clear progress interval
+                  clearInterval(progressInterval);
                 }
               }
             });

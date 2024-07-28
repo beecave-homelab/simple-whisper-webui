@@ -71,7 +71,13 @@ def transcribe():
     whisper = Whisper(domain)
     transcript = whisper.process_file(file_path)
 
-    return jsonify({"transcript": transcript})
+    transcript_filename = os.path.splitext(audio_file.filename)[0] + '.txt'
+    transcript_path = os.path.join('transcripts', transcript_filename)
+
+    with open(transcript_path, 'w') as f:
+        f.write(transcript)
+
+    return jsonify({"transcript": transcript, "transcript_path": transcript_filename})
 
 @app.route('/progress', methods=['GET'])
 def progress():
@@ -81,6 +87,11 @@ def progress():
 def uploaded_file(filename):
     return send_from_directory('uploads', filename)
 
+@app.route('/download/<filename>', methods=['GET'])
+def download_file(filename):
+    return send_from_directory('transcripts', filename)
+
 if __name__ == "__main__":
     os.makedirs('uploads', exist_ok=True)
+    os.makedirs('transcripts', exist_ok=True)
     app.run(debug=True)
