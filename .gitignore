@@ -1,0 +1,13 @@
+# Ignore everything by default
+*
+
+# Whitelist specific files and directories
+!*.py
+!*.html
+!*.env.example
+!/segements
+!/templates
+!/transcripts
+# !/uploads
+!*.md
+!LICENSE
