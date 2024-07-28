@@ -12,6 +12,7 @@ class Whisper:
         self.domain = domain
         self.whole_response = []
         self.total_segments = 0
+        self.progress_bar_value = 0
 
     def split_audio(self, file_path):
         audio = AudioSegment.from_file(file_path)
@@ -22,6 +23,7 @@ class Whisper:
             segment = audio[start_ms:end_ms]
             segments.append(segment)
         self.total_segments = len(segments)
+        self.progress_bar_value = 100 / self.total_segments if self.total_segments else 0
         return segments
 
     def process_segment(self, segment_file_path):
@@ -42,7 +44,7 @@ class Whisper:
                 segment_file_path = f"uploads/segment_{i}.mp3"
                 segment.export(segment_file_path, format="mp3")
                 self.process_segment(segment_file_path)
-                session['progress'] = int((i + 1) / self.total_segments * 100)
+                session['progress'] = min(100, int((i + 1) * self.progress_bar_value))
                 time.sleep(1)  # Simulate delay
             return ' '.join(self.whole_response)
         except Exception as e:
@@ -71,7 +73,13 @@ def transcribe():
     whisper = Whisper(domain)
     transcript = whisper.process_file(file_path)
 
-    return jsonify({"transcript": transcript})
+    transcript_filename = os.path.splitext(audio_file.filename)[0] + '.txt'
+    transcript_path = os.path.join('transcripts', transcript_filename)
+
+    with open(transcript_path, 'w') as f:
+        f.write(transcript)
+
+    return jsonify({"transcript": transcript, "transcript_path": transcript_filename})
 
 @app.route('/progress', methods=['GET'])
 def progress():
@@ -81,6 +89,11 @@ def progress():
 def uploaded_file(filename):
     return send_from_directory('uploads', filename)
 
+@app.route('/download/<filename>', methods=['GET'])
+def download_file(filename):
+    return send_from_directory('transcripts', filename)
+
 if __name__ == "__main__":
     os.makedirs('uploads', exist_ok=True)
+    os.makedirs('transcripts', exist_ok=True)
     app.run(debug=True)
