@@ -1,0 +1,6 @@
+argparse
+python-dotenv
+pydub
+openai
+flask
+requests
