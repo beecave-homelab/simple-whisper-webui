@@ -2,10 +2,12 @@ services:
   transcriptor:
     build:
       context: .
-    container_name: transcriptor-webui
+    image: ghcr.io/beecave-homelab/transcriptor:latest
     restart: unless-stopped
     ports:
-      - "5000:5000"
+      - "5050:5050"
     volumes:
       - ./uploads:/app/uploads
       - ./transcripts:/app/transcripts
+    environment:
+      - VIRTUAL_ENV=/app/venv
