@@ -4,8 +4,8 @@ COPY . /app
 WORKDIR /app
 
 RUN python -m venv venv \
-    && source venv/bin/activate \
-    && pip install -r requirements.
+    && . venv/bin/activate \
+    && pip install -r requirements.txt
 
 EXPOSE 5000
 CMD ["python", "app.py"]
