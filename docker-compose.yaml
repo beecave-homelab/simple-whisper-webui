@@ -1,5 +1,5 @@
 services:
-  transcriptor:
+  webui:
     build:
       context: .
     image: ghcr.io/beecave-homelab/transcriptor:latest
