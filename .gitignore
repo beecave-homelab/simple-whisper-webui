@@ -4,6 +4,9 @@
 # Whitelist specific files and directories
 !*.py
 !*.html
+!Dockerfile
+!*yml
+!*.yaml
 !*.env.example
 !/segements
 !/templates

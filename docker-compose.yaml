@@ -1,0 +1,11 @@
+services:
+  transcriptor:
+    build:
+      context: .
+    container_name: transcriptor-webui
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./transcripts:/app/transcripts
