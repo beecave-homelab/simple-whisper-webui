@@ -5,6 +5,7 @@
 !*.py
 !*.html
 !Dockerfile
+!dockerignore
 !*yml
 !*.yaml
 !*.env.example

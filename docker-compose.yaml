@@ -9,5 +9,5 @@ services:
     volumes:
       - ./uploads:/app/uploads
       - ./transcripts:/app/transcripts
-    environment:
-      - VIRTUAL_ENV=/app/venv
+    # environment:
+      # - VIRTUAL_ENV=/app/venv
