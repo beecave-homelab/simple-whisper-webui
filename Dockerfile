@@ -1,4 +1,4 @@
-FROM python:3.11-slim as BASE
+FROM python:3.11-slim
 
 # Set environment variables
 ENV VIRTUAL_ENV=/app/venv
