@@ -2,12 +2,12 @@ services:
   webui:
     build:
       context: .
-    image: ghcr.io/beecave-homelab/transcriptor:latest
+    # image: ghcr.io/beecave-homelab/simple-whisper-webui:latest
+    image: beecave/simple-whisper-webui:latest
+    container_name: simple-whisper-webui
     restart: unless-stopped
     ports:
       - "5050:5050"
     volumes:
       - ./uploads:/app/uploads
       - ./transcripts:/app/transcripts
-    # environment:
-      # - VIRTUAL_ENV=/app/venv
